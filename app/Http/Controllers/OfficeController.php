@@ -28,7 +28,7 @@ class OfficeController extends Controller
             ->collection($Offices)
             ->transformWith(new OfficeTransformer)
             //  ->includeUsers()
-            ->includeRooms();
+            ;
 
         if ($limit) {
             $paginator = $OfficeQuery->paginate($limit);

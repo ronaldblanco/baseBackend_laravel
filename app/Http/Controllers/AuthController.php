@@ -69,12 +69,10 @@ class AuthController extends Controller
             $final = Fractal::create()
             ->item($user)
             ->transformWith(new UserTransformer)
-            //->includeOrganization()
+            
             ->includeRoles()
             ->includePermissions()
-            //->includeGroups()
-            //->includeBuilding()
-            //->includeNotifications()
+           
             ->addMeta(
                 [
                     'access_token' => $accessToken,
@@ -115,12 +113,9 @@ class AuthController extends Controller
         return Fractal::create()
             ->item($user)
             ->transformWith(new UserTransformer)
-            ->includeOrganization()
             ->includeRoles()
             ->includePermissions()
-            ->includeGroups()
-            ->includeNotifications()
-            ->includeBuilding()
+            
             ->addMeta(
                 [
                     'access_token' => $accessToken,
@@ -146,12 +141,10 @@ class AuthController extends Controller
         return Fractal::create()
             ->item($user)
             ->transformWith(new UserTransformer)
-            ->includeOrganization()
+            
             ->includeRoles()
             ->includePermissions()
-            ->includeGroups()
-            ->includeBuilding()
-            ->includeNotifications()
+           
             ->toArray();
     }
 

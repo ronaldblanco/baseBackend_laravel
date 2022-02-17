@@ -63,10 +63,7 @@ class UsersController extends Controller
             ->transformWith(new UserTransformer)
             ->includeRoles()
             ->includeGroups()
-            ->includeBuildings()
-            ->includeLanguages()
-            ->includeCoordinators()
-            ->includeCrmmultifields();
+            ;
 
         if ($limit) {
             $paginator = $usersQuery->paginate($limit);
@@ -98,46 +95,10 @@ class UsersController extends Controller
             //dd($request->all());
             $user = User::create($request->all());
             //dd($user);
-            /*if ($request->has('roles')) {
+            if ($request->has('roles')) {
                 $user->syncRoles(json_decode($request->roles));
             }
-
-            if ($request->hasFile("avatar")) {
-                $user->addMediaFromRequest('avatar')->toMediaCollection("avatar");
-            }
-
-            if ($request->has('multifields')) {
-                foreach ($request->multifields as $multifield) {
-                    $user->multifields()->create($multifield);
-                }
-            }
-
-            if ($request->has("groups")) {
-                $groups = json_decode($request->get('groups'));
-                $user->groups()->sync($groups);
-            }
-
-
-            if ($request->has("coordinators")) {
-                $coordinators = json_decode($request->get('coordinators'));
-                $user->coordinators()->sync($coordinators);
-            }
-
-            if ($request->has("doctors")) {
-                $doctors = json_decode($request->get('doctors'));
-                $user->doctors()->sync($doctors);
-            }
-
-
-            if ($request->has("buildings")) {
-                $buildings = json_decode($request->get('buildings'));
-                $user->buildings()->sync($buildings);
-            }
-            if ($request->has("procedures")) {
-                $procedures = json_decode($request->get('procedures'));
-                $user->userProducts()->sync($procedures);
-            }*/
-
+            
             /*$languages = Language::where("company_id", $user->company_id)->get();
             $user->languages()->sync([]);
             $temp = [];
@@ -148,17 +109,13 @@ class UsersController extends Controller
             }
             $user->languages()->sync($temp);*/
 
-            return $user;
-            /*return Fractal::create()
+            //return $user;
+            return Fractal::create()
                 ->item($user)
                 ->transformWith(new UserTransformer)
-                //->includeRoles()
-                //->includeGroups()
-                //->includeBuildings()
-                //->includeLanguages()
-                //->includeCrmmultifields()
-               // ->includeCoordinators()
-                ->toArray();*/
+                ->includeRoles()
+                                
+                ->toArray();
         } catch (QueryException  $e) {
             $code = $e->getCode();
             if ($code == 23000) {
@@ -197,12 +154,7 @@ class UsersController extends Controller
             ->item($user)
             ->transformWith(new UserTransformer)
             ->includeRoles()
-            ->includeGroups()
-            ->includeBuildings()
-            ->includeCrmmultifields()
-            //->includeProductprices()
-            ->includeLanguages()
-            ->includeCoordinators()
+            
             ->toArray();
     }
 
@@ -289,45 +241,7 @@ class UsersController extends Controller
             $user = User::findOrFail($id); //Refresh the user
 
         }
-
-
-        if ($request->has("groups")) {
-            $groups = json_decode($request->get('groups'));
-            $user->groups()->sync($groups);
-        }
-
-        if ($request->has("buildings")) {
-            $buildings = json_decode($request->get('buildings'));
-            $user->buildings()->sync($buildings);
-        }
-
-        if ($request->has("coordinators")) {
-            $coordinators = json_decode($request->get('coordinators'));
-            $user->coordinators()->sync($coordinators);
-        }
-
-        if ($request->has("doctors")) {
-            $doctors = json_decode($request->get('doctors'));
-            $user->doctors()->sync($doctors);
-        }
-
-
-
-        if ($request->has("procedures")) {
-            $procedures = json_decode($request->get('procedures'));
-
-            $proceduresToUpdate =  [];
-            foreach ($procedures as $procedure) {
-
-                $proceduresToUpdate[$procedure->id] = ['flat_rate' => $procedure->flatrate, 'max_commission' => floatval($procedure->cost), 'max_commission_assistance' => floatval($procedure->costWithAssistance)];
-            }
-
-            // return $proceduresToUpdate;
-
-
-            $user->userProducts()->sync($proceduresToUpdate);
-        }
-
+              
 
         /*$languages = Language::where("company_id", $user->company_id)->get();
         $user->languages()->sync([]);
@@ -343,11 +257,7 @@ class UsersController extends Controller
             ->item($user)
             ->transformWith(new UserTransformer)
             ->includeRoles()
-            ->includeGroups()
-            ->includeBuildings()
-            ->includeCrmmultifields()
-            ->includeLanguages()
-            ->includeCoordinators()
+           
             ->toArray();
     }
 
@@ -368,11 +278,7 @@ class UsersController extends Controller
             ->transformWith(new UserTransformer)
             ->includeCompany()
             ->includeRoles()
-            ->includeGroups()
-            ->includeBuildings()
-            ->includePermissions()
-            ->includeCrmmultifields()
-            ->includeLanguages()
+            
             ->toArray();
     }
 
@@ -399,19 +305,7 @@ class UsersController extends Controller
 
         $user = User::findOrFail($id);
         $this->authorize('show_user_roles', $user);
-
-        /*$query = Role::where('user_id', $id);
-        $limit = $request->has('limit')?$request->get('limit'):false;
-        $rolesQuery = QueryBuilder::for($query);
-        //$rolesQuery = $user->roles;
-        $rolesQuery->allowedFilters(['name']);
-        //$rolesQuery->allowedIncludes(['departments']);
-        $rolesQuery->defaultSort('name');
-        $rolesQuery->allowedSorts(['name']);
-
-        $paginator = $rolesQuery->paginate($limit);
-        $roles = $rolesQuery->get();*/
-
+        
         return Fractal::create()
             ->collection($user->roles)
             ->transformWith(new RoleTransformer)

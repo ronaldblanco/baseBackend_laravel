@@ -38,7 +38,7 @@ class CompanyController extends Controller
     $response = Fractal::create()
       ->collection($Companys)
       ->transformWith(new CompanyTransformer)
-      ->includeDepartments();
+      ;
 
     if ($limit) {
       $paginator = $CompanysQuery->paginate($limit);
@@ -88,7 +88,7 @@ class CompanyController extends Controller
     return Fractal::create()
       ->item($Company)
       ->transformWith(new CompanyTransformer)
-      ->includeDepartments()
+      
       ->toJson();
   }
 
@@ -114,7 +114,7 @@ class CompanyController extends Controller
     return Fractal::create()
       ->item($Company)
       ->transformWith(new CompanyTransformer)
-      ->includeDepartments()
+      
       ->toJson();
   }
 
