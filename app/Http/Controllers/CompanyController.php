@@ -1,0 +1,137 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Company;
+use Spatie\Fractal\Fractal;
+use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
+use App\Transformers\CompanyTransformer;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+
+class CompanyController extends Controller
+{
+    //
+    /**
+   * Display a listing of the resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function index(Request $request)
+  {
+    $this->authorize('index', Company::class);
+
+    $query = Company::whereRaw('1=1'); //to run pure SQL querys! return all records in this case!
+    //dd($query);
+    $limit = $request->has('limit') ? $request->get('limit') : false;
+    $CompanysQuery = QueryBuilder::for($query);
+
+    $CompanysQuery->allowedFilters(['name']);
+    $CompanysQuery->allowedIncludes(['departments']);
+    $CompanysQuery->defaultSort('name');
+    $CompanysQuery->allowedSorts(['name']);
+
+
+    $Companys = $CompanysQuery->get();
+
+
+    $response = Fractal::create()
+      ->collection($Companys)
+      ->transformWith(new CompanyTransformer)
+      ->includeDepartments();
+
+    if ($limit) {
+      $paginator = $CompanysQuery->paginate($limit);
+      $response->paginateWith(new IlluminatePaginatorAdapter($paginator));
+    }
+
+
+    return $response->toArray();
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function store(Request $request)
+  {
+    $this->authorize('store', Company::class);
+    $Company = Company::create($request->all());
+
+    if ($request->hasFile("logo")) {
+      $Company->addMediaFromRequest('logo')->toMediaCollection("logo");
+    }
+
+    if ($request->hasFile("printLogo")) {
+      $Company->addMediaFromRequest('printLogo')->toMediaCollection("print_logo");
+    }
+
+    return Fractal::create()
+      ->item($Company)
+      ->transformWith(new CompanyTransformer)
+      ->toJson();
+  }
+
+  /**
+   * Display the specified resource.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function show($id)
+  {
+    $Company = Company::findOrFail($id);
+    $this->authorize('show', $Company);
+
+    return Fractal::create()
+      ->item($Company)
+      ->transformWith(new CompanyTransformer)
+      ->includeDepartments()
+      ->toJson();
+  }
+
+  /**
+   * Update the specified resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function update(Request $request, $id)
+  {
+    $Company = Company::findOrFail($id);
+    $this->authorize('update', $Company);
+    $Company->update($request->all());
+
+    if ($request->hasFile("printLogo")) {
+      $Company->addMediaFromRequest('printLogo')->toMediaCollection("print_logo");
+    }
+    if ($request->hasFile("logo")) {
+      $Company->addMediaFromRequest('logo')->toMediaCollection("logo");
+    }
+    return Fractal::create()
+      ->item($Company)
+      ->transformWith(new CompanyTransformer)
+      ->includeDepartments()
+      ->toJson();
+  }
+
+  /**
+   * Remove the specified resource from storage.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function destroy($id)
+  {
+    $Company = Company::findOrFail($id);
+    $this->authorize('destroy', Company::class);
+    $Company->delete();
+
+    return response()->json([
+      "message" => "Company deleted"
+    ], 202);
+  }
+}
