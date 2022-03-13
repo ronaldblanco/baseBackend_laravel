@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRoleRequest;
-use App\Models\Organization;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -14,16 +14,16 @@ class RolesController extends Controller
 {
 
 
-  public function store(StoreRoleRequest $request)
+  public function store(Request $request)
   {
-    $orgId = $request->get('organization_id');
-    $organization = Organization::findOrFail($orgId);
+    //$orgId = $request->get('company_id');
+    //$company = Company::findOrFail($orgId);
 
     //$this->authorize('store', Role::class);
 
     $role_name = $request->get('name');
 
-    $role = Role::create(['guard_name' => 'api', 'name' => $role_name, 'organization_id' => $orgId]);
+    $role = Role::create(['guard_name' => 'api', 'name' => $role_name/*, 'company_id' => $orgId*/]);
 
     if ($request->has('permissions')) {
       $role->syncPermissions($request->permissions);

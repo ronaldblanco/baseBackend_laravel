@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Office;
 use App\Models\Company;
 use Spatie\Fractal\Fractal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Transformers\UserTransformer;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Transformers\OfficeTransformer;
 use App\Transformers\CompanyTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
@@ -63,13 +65,13 @@ class CompanyController extends Controller
     $this->authorize('store', Company::class);
     $Company = Company::create($request->all());
 
-    if ($request->hasFile("logo")) {
+    /*if ($request->hasFile("logo")) {
       $Company->addMediaFromRequest('logo')->toMediaCollection("logo");
     }
 
     if ($request->hasFile("printLogo")) {
       $Company->addMediaFromRequest('printLogo')->toMediaCollection("print_logo");
-    }
+    }*/
 
     return Fractal::create()
       ->item($Company)
@@ -144,13 +146,32 @@ class CompanyController extends Controller
     $company = Company::findOrFail($id);
     $this->authorize('user_read', $company);
 
-    $query = User::where('users.company_id', $id)->all();
+    $query = User::where('users.company_id', $id)->get();
 
+    //return $query;
     return Fractal::create()
-      ->colletion($query)
+      ->collection($query)
       ->transformWith(new UserTransformer)
       
       ->toJson();
 
   }
+
+  public function show_all_offices(Request $request, $id)
+  {
+    $user = Auth::user();
+    $company = Company::findOrFail($id);
+    $this->authorize('user_read', $company);
+
+    $query = Office::where('offices.company_id', $id)->get();
+
+    //return $query;
+    return Fractal::create()
+      ->collection($query)
+      ->transformWith(new OfficeTransformer)
+      
+      ->toJson();
+
+  }
+
 }

@@ -59,6 +59,7 @@ class UserTransformer extends TransformerAbstract
             'lname' => $user->lname,
             'email' => $user->email,
             'password' => $user->password,
+            'active' => $user->active,
             'office_id' => $user->office_id, 
             'company_id' => $user->company_id, 
        ];

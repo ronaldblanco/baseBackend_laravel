@@ -63,8 +63,7 @@ class UsersController extends Controller
             ->collection($users)
             ->transformWith(new UserTransformer)
             ->includeRoles()
-            ->includeGroups()
-            ;
+            ->includeGroups();
 
         if ($limit) {
             $paginator = $usersQuery->paginate($limit);
@@ -88,7 +87,7 @@ class UsersController extends Controller
 
         //dd($request);
         $request["password"] = bcrypt($request->password);
-                //$company = company::findOrFail($request->company_id);
+        //$company = company::findOrFail($request->company_id);
 
         $policy = array(User::class, $request->company_id);
         $this->authorize('store', $policy);
@@ -97,9 +96,9 @@ class UsersController extends Controller
             $user = User::create($request->all());
             //dd($user);
             if ($request->has('roles')) {
-                $user->syncRoles(json_decode($request->roles));
+                $user->syncRoles(/*json_decode(*/$request->roles/*)*/);
             }
-            
+
             /*$languages = Language::where("company_id", $user->company_id)->get();
             $user->languages()->sync([]);
             $temp = [];
@@ -115,7 +114,7 @@ class UsersController extends Controller
                 ->item($user)
                 ->transformWith(new UserTransformer)
                 ->includeRoles()
-                                
+
                 ->toArray();
         } catch (QueryException  $e) {
             $code = $e->getCode();
@@ -155,7 +154,7 @@ class UsersController extends Controller
             ->item($user)
             ->transformWith(new UserTransformer)
             ->includeRoles()
-            
+
             ->toArray();
     }
 
@@ -169,7 +168,7 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {   
+    {
         /*$role = Role::findByName('user_manage');
         dd($role);*/
         $user = User::findOrFail($id);
@@ -179,7 +178,7 @@ class UsersController extends Controller
                 $request["password"] = bcrypt($request->password);
 
             if ($request->has('roles')) {
-                $user->syncRoles(json_decode($request->roles));
+                $user->syncRoles(/*json_decode(*/$request->roles/* )*/);
             }
 
             // was blocking is_professional, check it out
@@ -242,7 +241,7 @@ class UsersController extends Controller
             $user = User::findOrFail($id); //Refresh the user
 
         }
-              
+
 
         /*$languages = Language::where("company_id", $user->company_id)->get();
         $user->languages()->sync([]);
@@ -258,7 +257,7 @@ class UsersController extends Controller
             ->item($user)
             ->transformWith(new UserTransformer)
             ->includeRoles()
-           
+
             ->toArray();
     }
 
@@ -279,7 +278,7 @@ class UsersController extends Controller
             ->transformWith(new UserTransformer)
             ->includeCompany()
             ->includeRoles()
-            
+
             ->toArray();
     }
 
@@ -293,12 +292,16 @@ class UsersController extends Controller
     {
         $user = User::findOrFail($id);
         $this->authorize('destroy', $user);
-        $user->update(['active' => false]);
-        $user->delete();
+        if ($id != 1) {
+            $user->update(['active' => false]);
+            $user->delete();
 
-        return response()->json([
-            "message" => "user deleted"
-        ], 202);
+            return response()->json([
+                "message" => "user deleted"
+            ], 202);
+        } else return response()->json([
+            "message" => "main user id = 1 can not be deleted"
+        ], 402);
     }
 
     public function show_user_roles(Request $request, $id)
@@ -306,7 +309,7 @@ class UsersController extends Controller
 
         $user = User::findOrFail($id);
         $this->authorize('show_user_roles', $user);
-        
+
         return Fractal::create()
             ->collection($user->roles)
             ->transformWith(new RoleTransformer)
@@ -319,7 +322,7 @@ class UsersController extends Controller
         $roles = Role::all();
         $user = User::findOrFail($id);
         $this->authorize('show_user_roles', $user);
-        
+
         return Fractal::create()
             ->collection($roles)
             ->transformWith(new RoleTransformer)
@@ -327,7 +330,7 @@ class UsersController extends Controller
             ->toArray();
     }
 
-    
+
     public function give_role(Request $request, $id)
     {
 
@@ -386,11 +389,10 @@ class UsersController extends Controller
     }
 
     public function index_all_permissions(Request $request, $id)
-  {
-    $permissions = Permission::all()
-      ->groupBy('module_name');
+    {
+        $permissions = Permission::all()
+            ->groupBy('module_name');
 
-    return response()->json($permissions);
-  }
-    
+        return response()->json($permissions);
+    }
 }
