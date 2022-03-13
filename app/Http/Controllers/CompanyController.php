@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Company;
 use Spatie\Fractal\Fractal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Transformers\UserTransformer;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Transformers\CompanyTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -133,5 +136,21 @@ class CompanyController extends Controller
     return response()->json([
       "message" => "Company deleted"
     ], 202);
+  }
+
+  public function show_all_users(Request $request, $id)
+  {
+    $user = Auth::user();
+    $company = Company::findOrFail($id);
+    $this->authorize('user_read', $company);
+
+    $query = User::where('users.company_id', $id)->all();
+
+    return Fractal::create()
+      ->colletion($query)
+      ->transformWith(new UserTransformer)
+      
+      ->toJson();
+
   }
 }

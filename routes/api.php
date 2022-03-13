@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
 
 /*
@@ -51,13 +52,24 @@ Route::middleware(['auth:api'/*,'scopes:manage-dashboard'*/])->group(function ()
     Route::post('/users/{id}', [UsersController::class, 'update']);
     Route::delete('/users/{id}', [UsersController::class, 'destroy']);
 
+    Route::get('/users/all/roles/{id}', [UsersController::class, 'show_all_roles']);
+    Route::get('/users/all/permissions/{id}', [UsersController::class, 'index_all_permissions']);
+
     Route::post('/users/{id}/roles', [UsersController::class, 'give_role']);
     Route::put('/users/{id}/roles', [UsersController::class, 'sync_roles']);
     Route::delete('/users/{id}/role/{roleId}', [UsersController::class, 'revoke_role']);
     Route::get('/users/{id}/roles', [UsersController::class, 'show_user_roles']);
     Route::get('/users/{id}/permissions', [UsersController::class, 'show_user_permissions']);
 
+    //Roles
+    Route::post('/roles', [RolesController::class, 'store']);
+    Route::put('/roles/{id}', [RolesController::class, 'update']);
+    Route::delete('/roles/{id}', [RolesController::class, 'destroy']);
+
     //companys
+
+    Route::get('/company/{id}/users2', [CompanysController::class, 'show_all_users']);
+
     Route::get('/companys', [CompanysController::class, 'index']);
     Route::post('/companys', [CompanysController::class, 'store']);
     Route::post('/companys/{id}', [CompanysController::class, 'update']);

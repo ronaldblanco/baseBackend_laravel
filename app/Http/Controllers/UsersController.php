@@ -24,6 +24,7 @@ use App\Classes\Firebase\FirebaseFacade;
 use App\Transformers\PermissionTransformer;
 use App\Classes\VoipNotification\VoipNotificationFacade;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use Spatie\Permission\Models\Permission;
 
 class UsersController extends Controller
 {
@@ -268,7 +269,7 @@ class UsersController extends Controller
         if ($request->has("password") && $request->get("passport") != "")
             $request["password"] = bcrypt($request->password);
 
-        $user->update($request->except(['company_id', 'department_id']));
+        $user->update($request->except(['company_id', 'office_id']));
 
         /*if ($request->hasFile("avatar")) {
             $user->addMediaFromRequest('avatar')->toMediaCollection("avatar");
@@ -309,6 +310,20 @@ class UsersController extends Controller
         return Fractal::create()
             ->collection($user->roles)
             ->transformWith(new RoleTransformer)
+            ->toArray();
+    }
+
+    public function show_all_roles(Request $request, $id)
+    {
+
+        $roles = Role::all();
+        $user = User::findOrFail($id);
+        $this->authorize('show_user_roles', $user);
+        
+        return Fractal::create()
+            ->collection($roles)
+            ->transformWith(new RoleTransformer)
+            ->includePermissions()
             ->toArray();
     }
 
@@ -369,4 +384,13 @@ class UsersController extends Controller
             ->transformWith(new PermissionTransformer)
             ->toArray();
     }
+
+    public function index_all_permissions(Request $request, $id)
+  {
+    $permissions = Permission::all()
+      ->groupBy('module_name');
+
+    return response()->json($permissions);
+  }
+    
 }
