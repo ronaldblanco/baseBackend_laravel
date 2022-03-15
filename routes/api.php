@@ -63,6 +63,8 @@ Route::middleware(['auth:api'/*,'scopes:manage-dashboard'*/])->group(function ()
     Route::get('/users/{id}/roles', [UsersController::class, 'show_user_roles']);
     Route::get('/users/{id}/permissions', [UsersController::class, 'show_user_permissions']);
 
+    Route::get('/users/{id}/logs', [UsersController::class, 'index_user_logs']);
+   
     //Roles
     Route::post('/roles', [RolesController::class, 'store']);
     Route::put('/roles/{id}', [RolesController::class, 'update']);

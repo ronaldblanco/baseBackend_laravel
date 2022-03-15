@@ -44,6 +44,18 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected static $logName = 'users';
+    protected static $logAttributes = [
+        'fname',
+        'lname',
+        'email',
+        'password',
+        'active',
+        'company_id',
+        'office_id'
+    ];
+    protected static $logOnlyDirty = true;
+
     /**
      * The attributes that should be cast.
      *
@@ -63,7 +75,7 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Office', "office_id");
     }
 
-    public function getActivitylogOptions(): LogOptions
+    /*public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
         ->logOnly([
@@ -71,5 +83,5 @@ class User extends Authenticatable
         ])
         ->logOnlyDirty(true)
         ->useLogName('users');
-    }
+    }*/
 }

@@ -19,6 +19,12 @@ class Office extends Model
         'name', 'logo', 'email', 'phone', 'website', 'address', 'company_id'
     ];
 
+    protected static $logName = 'users';
+    protected static $logAttributes = [
+        'name', 'logo', 'email', 'phone', 'website', 'address', 'company_id'
+    ];
+    protected static $logOnlyDirty = true;
+
     public function users()
     {
         return $this->hasMany('App\Models\User', 'office_id');
@@ -29,7 +35,7 @@ class Office extends Model
         return $this->belongsTo('App\Models\Company');
     }
 
-    public function getActivitylogOptions(): LogOptions
+    /*public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly([
@@ -37,5 +43,5 @@ class Office extends Model
             ])
             ->logOnlyDirty(true)
             ->useLogName('offices');
-    }
+    }*/
 }

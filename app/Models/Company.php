@@ -28,6 +28,13 @@ class Company extends Model implements HasMedia
 
     ];
 
+    protected static $logName = 'companys';
+    protected static $logAttributes = [
+        'name', 'tax', 'commission', 'email', 'phone', 'fax', 'website', 'smtpserver',
+        'smtpsecure', 'smtpuser', 'smtppass', 'smtpport', 'address', 'theme', 'logo'
+    ];
+    protected static $logOnlyDirty = true;
+
     public function registerMediaCollections(): void
     {
         $this
@@ -53,7 +60,7 @@ class Company extends Model implements HasMedia
         return $this->hasMany('App\Models\User', 'company_id');
     }
 
-    public function getActivitylogOptions(): LogOptions
+    /*public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly([
@@ -62,5 +69,5 @@ class Company extends Model implements HasMedia
             ])
             ->logOnlyDirty(true)
             ->useLogName('companys');
-    }
+    }*/
 }

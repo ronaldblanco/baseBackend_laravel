@@ -174,8 +174,8 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $this->authorize('update', $user);
         try {
-            if ($request->has("password"))
-                $request["password"] = bcrypt($request->password);
+            if ($request->has("password") && $request->password != "") $request["password"] = bcrypt($request->password);
+                else $request["password"] = $user->password;
 
             if ($request->has('roles')) {
                 $user->syncRoles(/*json_decode(*/$request->roles/* )*/);
@@ -394,5 +394,22 @@ class UsersController extends Controller
             ->groupBy('module_name');
 
         return response()->json($permissions);
+    }
+
+    public function index_user_logs(Request $request, $id)
+    {
+        $us = User::findOrFail($id);
+        //$this->authorize('index_user_logs', $user);
+
+        $activitiesFormated = [];
+        $activities = $us->activities->sortByDesc('created_at');
+        foreach ($activities as $activity) {
+            if ($activity->causer_type && $activity->causer_type::where('id', '=', $activity->causer_id)->exists()) {
+                $activity->causer_name = $activity->causer_type::find($activity->causer_id)->title;
+                array_push($activitiesFormated, $activity);
+            }
+        }
+        
+        return $activitiesFormated;
     }
 }
