@@ -2,7 +2,9 @@
 
 Install:
 ```
-composer install or composer install --ignore-platform-req=php
+composer install 
+or 
+composer install --ignore-platform-req=php
 ```
 Configure:
 ```
